@@ -10,7 +10,7 @@ dependencies = [
     "pydantic-settings",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "pytest",
     "httpx",
@@ -23,9 +23,13 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 88
 target-version = "py313"
+src = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["devsecapp"]
 
 [build-system]
 requires = ["setuptools>=68"]
