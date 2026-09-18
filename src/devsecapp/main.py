@@ -1,10 +1,14 @@
 from fastapi import FastAPI
 
+from devsecapp.api.vulnerabilities import router as vulnerabilities_router
+
 app = FastAPI(
     title="DevSecApp",
     description="Secure vulnerability management API",
     version="0.1.0",
 )
+
+app.include_router(vulnerabilities_router)
 
 
 @app.get("/health")
