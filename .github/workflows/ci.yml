@@ -56,3 +56,8 @@ jobs:
         run: |
           ruff check .
           ruff format --check .
+
+      - name: Run Semgrep
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: "p/python"
