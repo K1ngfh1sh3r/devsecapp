@@ -61,3 +61,6 @@ jobs:
         uses: semgrep/semgrep-action@v1
         with:
           config: "p/python"
+
+      - name: Run Bandit
+        run: bandit -r src -ll
