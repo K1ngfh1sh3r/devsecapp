@@ -30,4 +30,5 @@ dist/
 *.egg-info/
 
 # Logs
-*.log
+*.log.env.test
+.env.test
