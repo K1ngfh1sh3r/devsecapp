@@ -85,5 +85,6 @@ jobs:
           format: table
           exit-code: "1"
           ignore-unfixed: true
-          severity-threshold: CRITICAL,HIGH
+          severity: CRITICAL,HIGHclear
+
           
