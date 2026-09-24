@@ -77,3 +77,18 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t devsecapp:${{ github.sha }} .
+
+      - name: Verify Python package versions
+        run: |
+          docker run --rm devsecapp:${{ github.sha }} python -c "import msgpack, setuptools; print('msgpack', msgpack.__version__); print('setuptools', setuptools.__version__)"
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: devsecapp:${{ github.sha }}
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          severity: "HIGH,CRITICAL"
+
+          
