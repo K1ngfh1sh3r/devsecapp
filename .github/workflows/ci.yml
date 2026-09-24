@@ -78,6 +78,10 @@ jobs:
       - name: Build Docker image
         run: docker build -t devsecapp:${{ github.sha }} .
 
+      - name: Verify Python package versions
+        run: |
+          docker run --rm devsecapp:${{ github.sha }} python -c "import msgpack, setuptools; print('msgpack', msgpack.__version__); print('setuptools', setuptools.__version__)"
+
       - name: Run Trivy
         uses: aquasecurity/trivy-action@master
         with:
