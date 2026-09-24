@@ -8,7 +8,9 @@ ENV PYTHONUNBUFFERED=1
 COPY pyproject.toml .
 COPY src ./src
 
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir --upgrade pip setuptools \
+    && pip install --no-cache-dir . \
+    && pip install --no-cache-dir --upgrade "msgpack>=1.2.1" "setuptools>=83.0.0"
 
 RUN useradd --create-home --shell /usr/sbin/nologin appuser \
     && chown -R appuser:appuser /app
