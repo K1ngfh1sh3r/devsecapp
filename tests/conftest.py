@@ -3,6 +3,7 @@ import os
 os.environ["ENV_FILE"] = ".env.test"
 
 import pytest
+
 from devsecapp.database.connection import engine
 from devsecapp.database.models import Base
 
