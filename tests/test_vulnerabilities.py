@@ -66,7 +66,8 @@ def test_list_vulnerabilities() -> None:
     assert isinstance(data, list)
     assert len(data) >= 1
     assert any(
-        vulnerability["title"] == "List test vulnerability" for vulnerability in data
+        vulnerability["title"] == "List test vulnerability"
+        for vulnerability in data
     )
 
 
