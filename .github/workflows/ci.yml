@@ -22,13 +22,13 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_DB: devsecapp
+          POSTGRES_DB: devsecapp_test
           POSTGRES_USER: devsecapp
           POSTGRES_PASSWORD: change-me
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U devsecapp -d devsecapp"
+          --health-cmd "pg_isready -U devsecapp -d devsecapp_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -51,7 +51,7 @@ jobs:
 
       - name: Run tests
         env:
-          POSTGRES_DB: devsecapp
+          POSTGRES_DB: devsecapp_test
           POSTGRES_USER: devsecapp
           POSTGRES_PASSWORD: change-me
           POSTGRES_HOST: localhost
