@@ -1,6 +1,6 @@
 # DevSecApp
 
-**DevSecApp** is a secure vulnerability management REST API developed as part of the Oteria cybersecurity curriculum.
+**DevSecApp** is a secure vulnerability management REST API developed as a **student project at Oteria**.
 
 The project demonstrates a complete **DevSecOps development workflow**, from application development and automated testing to static analysis, dependency auditing, secret scanning, container hardening, vulnerability scanning, and container publication.
 
@@ -47,35 +47,35 @@ The main objectives are:
           │                  │                  │
           ▼                  ▼                  ▼
        Pytest              Ruff           Security scans
-                                             │
-                         ┌───────────────────┼───────────────────┐
-                         │                   │                   │
-                         ▼                   ▼                   ▼
-                      Semgrep              Bandit            pip-audit
-                         │                   │                   │
-                         └───────────────────┼───────────────────┘
-                                             │
-                                             ▼
-                                          Gitleaks
-                                             │
-                                             ▼
-                                      Docker image build
-                                             │
-                                             ▼
-                                           Trivy
-                                             │
-                                             ▼
-                                            GHCR
+                                                │
+                            ┌───────────────────┼───────────────────┐
+                            │                   │                   │
+                            ▼                   ▼                   ▼
+                         Semgrep              Bandit            pip-audit
+                            │                   │                   │
+                            └───────────────────┼───────────────────┘
+                                                │
+                                                ▼
+                                             Gitleaks
+                                                │
+                                                ▼
+                                         Docker image build
+                                                │
+                                                ▼
+                                              Trivy
+                                                │
+                                                ▼
+                                               GHCR
 
 
                     Runtime environment
                     ┌────────────────────────────┐
                     │       Docker Compose       │
                     │                            │
-                    │  ┌──────────┐  ┌────────┐ │
-                    │  │ FastAPI  │──│Postgres│ │
-                    │  │   API    │  │   DB   │ │
-                    │  └──────────┘  └────────┘ │
+                    │  ┌──────────┐  ┌────────┐  │
+                    │  │ FastAPI  │──│Postgres│  │
+                    │  │   API    │  │   DB   │  │
+                    │  └──────────┘  └────────┘  │
                     │                            │
                     └────────────────────────────┘
 ```
@@ -451,7 +451,7 @@ The pipeline performs the following checks:
 
 ```text
 1. Checkout source code
-        ↓
+        ↓   
 2. Install Python dependencies
         ↓
 3. Run Pytest
@@ -618,4 +618,4 @@ The mandatory technical implementation and CI security pipeline are complete.
 
 ## Educational Context
 
-This project was developed as part of the **Oteria cybersecurity curriculum** to demonstrate practical DevSecOps principles and the integration of security controls into a software development lifecycle.
+This project was developed as a **student project at Oteria**, with the objective of applying practical DevSecOps principles and integrating security controls throughout the software development lifecycle.
