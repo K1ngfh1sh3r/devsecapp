@@ -1,0 +1,773 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ARES - Plateforme de gestion des vulnérabilités">
+    <meta name="theme-color" content="#080f1b">
+
+    <title>ARES | Security Dashboard</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/app.js" defer></script>
+</head>
+
+<body>
+    <div class="app-shell">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="brand-mark">A</div>
+
+                <div class="brand-info">
+                    <h1>ARES</h1>
+                    <span>DevSecApp v0.1.0</span>
+                </div>
+            </div>
+
+            <nav class="main-nav" aria-label="Navigation principale">
+                <a href="#dashboard" class="nav-link active">
+                    <span class="nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="#vulnerabilities" class="nav-link">
+                    <span class="nav-icon">◈</span>
+                    <span>Vulnérabilités</span>
+                </a>
+
+                <a href="#reports" class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    <span>Rapports</span>
+                </a>
+
+                <a href="#settings" class="nav-link">
+                    <span class="nav-icon">⚙</span>
+                    <span>Paramètres</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-status">
+                <span class="status-indicator"></span>
+
+                <div>
+                    <strong>Système opérationnel</strong>
+                    <small>Surveillance active</small>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <span>ARES Security Platform</span>
+                <small>Secure today. Protect tomorrow.</small>
+            </div>
+
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content" id="dashboard">
+
+            <!-- DASHBOARD VIEW -->
+            <section
+                class="page-view active"
+                id="view-dashboard"
+                data-page="dashboard"
+            >
+
+                <header class="topbar">
+                    <div>
+                        <p class="eyebrow">CENTRE DE SUPERVISION</p>
+                        <h2>Tableau de bord</h2>
+
+                        <p class="page-description">
+                            Vue d'ensemble de votre posture de sécurité
+                        </p>
+                    </div>
+
+                    <div class="topbar-actions">
+
+                        <div class="connection-status">
+                            <span class="status-indicator"></span>
+                            <span>En ligne</span>
+                        </div>
+
+                        <div class="user-profile">
+                            <div class="avatar">AD</div>
+
+                            <div>
+                                <strong>Administrateur</strong>
+                                <small>Équipe IT</small>
+                            </div>
+                        </div>
+
+                    </div>
+                </header>
+
+                <!-- STATISTICS -->
+                <section class="stats-grid" aria-label="Statistiques">
+
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>Total vulnérabilités</span>
+                            <span class="stat-icon orange">◈</span>
+                        </div>
+
+                        <strong class="stat-value" id="total-count">--</strong>
+                        <span class="stat-caption">
+                            Enregistrées dans le système
+                        </span>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>Critiques</span>
+                            <span class="stat-icon red">!</span>
+                        </div>
+
+                        <strong class="stat-value" id="critical-count">--</strong>
+                        <span class="stat-caption">
+                            Nécessitent une attention immédiate
+                        </span>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>En cours</span>
+                            <span class="stat-icon amber">◷</span>
+                        </div>
+
+                        <strong class="stat-value" id="progress-count">--</strong>
+                        <span class="stat-caption">
+                            En cours de traitement
+                        </span>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-heading">
+                            <span>Résolues</span>
+                            <span class="stat-icon green">✓</span>
+                        </div>
+
+                        <strong class="stat-value" id="resolved-count">--</strong>
+                        <span class="stat-caption">
+                            Traitements terminés
+                        </span>
+                    </article>
+
+                </section>
+
+                <!-- CHARTS -->
+                <section class="charts-grid" aria-label="Analyses">
+
+                    <article class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <p class="eyebrow">ANALYSE</p>
+                                <h3>Répartition par sévérité</h3>
+                            </div>
+
+                            <span class="panel-icon">▥</span>
+                        </div>
+                        <div class="chart-placeholder" id="severity-chart">
+                            <div class="empty-chart">
+                                <span class="empty-chart-icon">◉</span>
+                                <p>Chargement des données</p>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <p class="eyebrow">SUIVI</p>
+                                <h3>État des vulnérabilités</h3>
+                            </div>
+
+                            <span class="panel-icon">▤</span>
+                        </div>
+
+                        <div class="chart-placeholder" id="status-chart">
+                            <div class="empty-chart">
+                                <span class="empty-chart-icon">◉</span>
+                                <p>Chargement des données</p>
+                            </div>
+                        </div>
+                    </article>
+
+                </section>
+
+                <!-- RECENT ACTIVITY -->
+                <section class="bottom-grid">
+
+                    <article class="panel vulnerabilities-panel" id="recent-vulnerabilities">
+
+                        <div class="panel-header">
+                            <div>
+                                <p class="eyebrow">SURVEILLANCE</p>
+                                <h3>Dernières vulnérabilités</h3>
+                            </div>
+
+                            <a href="#vulnerabilities" class="text-link">
+                                Voir tout →
+                            </a>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Titre</th>
+                                        <th>Sévérité</th>
+                                        <th>Statut</th>
+                                        <th>Composant</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="vulnerability-list">
+                                    <tr>
+                                        <td colspan="5" class="table-empty">
+                                            Chargement des vulnérabilités...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </article>
+
+                    <article class="panel activity-panel">
+
+                        <div class="panel-header">
+                            <div>
+                                <p class="eyebrow">JOURNAL</p>
+                                <h3>Activité récente</h3>
+                            </div>
+
+                            <span class="panel-icon">ϟ</span>
+                        </div>
+
+                        <div class="activity-empty">
+                            <span>◷</span>
+                            <p>Les événements seront affichés ici.</p>
+                            <small>Journal d'activité à venir</small>
+                        </div>
+
+                    </article>
+
+                </section>
+
+            </section>
+
+            <!-- VULNERABILITIES VIEW -->
+            <section
+                class="page-view"
+                id="view-vulnerabilities"
+                data-page="vulnerabilities"
+                hidden
+            >
+
+                <header class="topbar">
+                    <div>
+                        <p class="eyebrow">GESTION DE LA SÉCURITÉ</p>
+                        <h2>Vulnérabilités</h2>
+
+                        <p class="page-description">
+                            Inventaire et suivi des vulnérabilités détectées.
+                        </p>
+                    </div>
+                </header>
+
+                <article class="panel">
+
+                    <div class="panel-header inventory-header">
+                        <div>
+                            <p class="eyebrow">INVENTAIRE</p>
+                            <h3>Vulnérabilités enregistrées</h3>
+                        </div>
+
+                        <button
+                            type="button"
+                            id="add-vulnerability-button"
+                            class="primary-button"
+                        >
+                            <span aria-hidden="true">+</span>
+                            Nouvelle vulnérabilité
+                        </button>
+                    </div>
+
+                    <!-- SEARCH AND FILTERS -->
+                    <div class="vulnerability-toolbar">
+
+                        <div class="search-field">
+                            <label for="vulnerability-search">
+                                Rechercher
+                            </label>
+
+                            <input
+                                type="search"
+                                id="vulnerability-search"
+                                placeholder="Titre ou composant..."
+                            >
+                        </div>
+
+                        <div class="filter-field">
+                            <label for="severity-filter">
+                                Sévérité
+                            </label>
+
+                            <select id="severity-filter">
+                                <option value="">Toutes les sévérités</option>
+                                <option value="CRITICAL">Critique</option>
+                                <option value="HIGH">Élevée</option>
+                                <option value="MEDIUM">Moyenne</option>
+                                <option value="LOW">Faible</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-field">
+                            <label for="status-filter">
+                                Statut
+                            </label>
+
+                            <select id="status-filter">
+                                <option value="">Tous les statuts</option>
+                                <option value="OPEN">Ouverte</option>
+                                <option value="IN_PROGRESS">En cours</option>
+                                <option value="RESOLVED">Résolue</option>
+                            </select>
+                        </div>
+
+                        <button
+                            type="button"
+                            id="reset-filters"
+                            class="secondary-button"
+                        >
+                            Réinitialiser
+                        </button>
+
+                    </div>
+
+                    <!-- RESULTS COUNT -->
+                    <p
+                        id="vulnerability-results-count"
+                        class="page-description"
+                    >
+                        Chargement des vulnérabilités...
+                    </p>
+
+                    <!-- VULNERABILITIES TABLE -->
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Titre</th>
+                                    <th>Sévérité</th>
+                                    <th>Statut</th>
+                                    <th>Composant</th>
+                                    <th>Date</th>
+				    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="all-vulnerabilities-list">
+                                <tr>
+                                    <td colspan="6" class="table-empty">
+                                        Chargement à venir.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </article>
+
+            </section>
+
+
+<!-- REPORTS VIEW -->
+<section
+    class="page-view"
+    id="view-reports"
+    data-page="reports"
+    hidden
+>
+
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">ANALYSE ET CONFORMITÉ</p>
+            <h2>Rapports</h2>
+            <p class="page-description">
+                Synthèses et indicateurs de sécurité de la plateforme.
+            </p>
+        </div>
+
+	        <div class="topbar-actions">
+            <button
+                class="secondary-button"
+                id="export-report-btn"
+                type="button"
+            >
+                Exporter CSV
+            </button>
+        </div>
+    </header>
+
+    <!-- KEY INDICATORS -->
+    <section class="stats-grid" aria-label="Indicateurs des rapports">
+
+        <article class="stat-card">
+            <div class="stat-heading">
+                <span>Total vulnérabilités</span>
+                <span class="stat-icon orange">◈</span>
+            </div>
+            <strong class="stat-value" id="report-total">--</strong>
+            <span class="stat-caption">Enregistrées dans le système</span>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-heading">
+                <span>Critiques et élevées</span>
+                <span class="stat-icon red">!</span>
+            </div>
+            <strong class="stat-value" id="report-high-risk">--</strong>
+            <span class="stat-caption">Niveaux HIGH et CRITICAL</span>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-heading">
+                <span>Ouvertes</span>
+                <span class="stat-icon amber">◷</span>
+            </div>
+            <strong class="stat-value" id="report-open">--</strong>
+            <span class="stat-caption">En attente de traitement</span>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-heading">
+                <span>Taux de résolution</span>
+                <span class="stat-icon green">✓</span>
+            </div>
+            <strong class="stat-value" id="report-resolution-rate">--</strong>
+            <span class="stat-caption">Part des vulnérabilités résolues</span>
+        </article>
+
+    </section>
+
+    <!-- DISTRIBUTION -->
+    <section class="charts-grid">
+
+        <article class="panel">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">NIVEAUX DE RISQUE</p>
+                    <h3>Répartition par criticité</h3>
+                </div>
+                <span class="panel-icon">◈</span>
+            </div>
+
+            <div class="chart-placeholder" id="report-severity-chart">
+                <div class="empty-chart">
+                    <span class="empty-chart-icon">◈</span>
+                    <p>Chargement des données...</p>
+                </div>
+            </div>
+        </article>
+
+        <article class="panel">
+            <div class="panel-header">
+                <div>
+                    <p class="eyebrow">SUIVI DES CORRECTIONS</p>
+                    <h3>État du traitement</h3>
+                </div>
+                <span class="panel-icon">◷</span>
+            </div>
+
+            <div class="chart-placeholder" id="report-status-chart">
+                <div class="empty-chart">
+                    <span class="empty-chart-icon">◷</span>
+                    <p>Chargement des données...</p>
+                </div>
+            </div>
+        </article>
+
+    </section>
+
+    <!-- PRIORITY VULNERABILITIES -->
+    <article class="panel">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">SURVEILLANCE PRIORITAIRE</p>
+                <h3>Vulnérabilités à traiter en priorité</h3>
+            </div>
+            <span class="panel-icon">!</span>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vulnérabilité</th>
+                        <th>Composant</th>
+                        <th>Criticité</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="report-priority-list">
+                    <tr>
+                        <td colspan="4">Chargement des données...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+</section>
+
+            <!-- SETTINGS VIEW -->
+            <section
+                class="page-view"
+                id="view-settings"
+                data-page="settings"
+                hidden
+            >
+                <header class="topbar">
+                    <div>
+                        <p class="eyebrow">ADMINISTRATION</p>
+                        <h2>Paramètres</h2>
+                        <p class="page-description">
+                            Informations générales sur la plateforme ARES.
+                        </p>
+                    </div>
+                </header>
+
+                <div class="settings-grid">
+
+                    <article class="panel settings-card">
+                        <p class="eyebrow">APPLICATION</p>
+                        <h3>DevSecApp</h3>
+                        <p class="page-description">
+                            Application de gestion et de suivi des vulnérabilités.
+                        </p>
+                        <div class="settings-info">
+                            <div>
+                                <span>Version</span>
+                                <strong>0.1.0</strong>
+                            </div>
+                            <div>
+                                <span>Plateforme</span>
+                                <strong>ARES</strong>
+                            </div>
+                            <div>
+                                <span>Interface</span>
+                                <strong>Web</strong>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="panel settings-card">
+                        <p class="eyebrow">INFRASTRUCTURE</p>
+                        <h3>Environnement serveur</h3>
+                        <p class="page-description">
+                            Architecture technique hébergeant l'application.
+                        </p>
+                        <div class="settings-info">
+                            <div>
+                                <span>Serveur</span>
+                                <strong>Debian</strong>
+                            </div>
+                            <div>
+                                <span>Conteneurisation</span>
+                                <strong>Docker</strong>
+                            </div>
+                            <div>
+                                <span>Serveur Web</span>
+                                <strong>Nginx</strong>
+                            </div>
+                            <div>
+                                <span>Accès</span>
+                                <strong>HTTPS</strong>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="panel settings-card">
+                        <p class="eyebrow">SÉCURITÉ</p>
+                        <h3>Mesures de protection</h3>
+                        <p class="page-description">
+                            Principes de sécurité intégrés à l'environnement ARES.
+                        </p>
+                        <div class="settings-info">
+                            <div>
+                                <span>Segmentation réseau</span>
+                                <strong>VLAN</strong>
+                            </div>
+                            <div>
+                                <span>Filtrage réseau</span>
+                                <strong>OPNsense</strong>
+                            </div>
+                            <div>
+                                <span>Communication Web</span>
+                                <strong>HTTPS</strong>
+                            </div>
+                            <div>
+                                <span>Base de données</span>
+                                <strong>Non exposée</strong>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+            <!-- FOOTER -->
+            <footer class="main-footer">
+                <span>ARES — DevSecApp</span>
+                <span>Plateforme de gestion des vulnérabilités</span>
+                <span>Version 0.1.0</span>
+            </footer>
+
+        </main>
+
+    </div>
+    <!-- CREATE / EDIT VULNERABILITY MODAL -->
+<div id="vulnerability-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+        <div class="modal-header">
+            <div>
+                <p class="eyebrow">GESTION DES RISQUES</p>
+                <h2 id="modal-title">Nouvelle vulnérabilité</h2>
+            </div>
+
+            <button
+                type="button"
+                id="close-modal-button"
+                class="modal-close"
+                aria-label="Fermer"
+            >&times;</button>
+        </div>
+
+        <form id="vulnerability-form">
+
+            <div class="form-group">
+                <label for="vulnerability-title">Titre</label>
+                <input
+                    type="text"
+                    id="vulnerability-title"
+                    name="title"
+                    maxlength="255"
+                    required
+                    placeholder="Ex : Injection SQL"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="vulnerability-description">Description</label>
+                <textarea
+                    id="vulnerability-description"
+                    name="description"
+                    rows="4"
+                    required
+                    placeholder="Décris la vulnérabilité..."
+                ></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="vulnerability-severity">Sévérité</label>
+                    <select id="vulnerability-severity" name="severity" required>
+                        <option value="LOW">Faible</option>
+                        <option value="MEDIUM" selected>Moyenne</option>
+                        <option value="HIGH">Élevée</option>
+                        <option value="CRITICAL">Critique</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="vulnerability-status">Statut</label>
+                    <select id="vulnerability-status" name="status" required>
+                        <option value="OPEN" selected>Ouverte</option>
+                        <option value="IN_PROGRESS">En cours</option>
+                        <option value="RESOLVED">Résolue</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="vulnerability-component">Composant affecté</label>
+                <input
+                    type="text"
+                    id="vulnerability-component"
+                    name="affected_component"
+                    maxlength="255"
+                    required
+                    placeholder="Ex : Nginx, API, PostgreSQL..."
+                >
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="cancel-modal-button" class="secondary-button">
+                    Annuler
+                </button>
+                <button type="submit" id="save-vulnerability-button" class="primary-button">
+                    Enregistrer
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+<!-- DELETE CONFIRMATION MODAL -->
+<div id="delete-confirmation-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card delete-modal-card"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="delete-modal-title">
+
+        <div class="modal-header">
+            <div>
+                <p class="eyebrow">GESTION DES RISQUES</p>
+                <h2 id="delete-modal-title">Confirmer la suppression</h2>
+            </div>
+
+            <button
+                type="button"
+                id="close-delete-modal-button"
+                class="modal-close"
+                aria-label="Fermer"
+            >&times;</button>
+        </div>
+
+        <p class="delete-modal-message">
+            Tu es sur le point de supprimer définitivement la vulnérabilité :
+        </p>
+
+        <p id="delete-vulnerability-title" class="delete-vulnerability-title"></p>
+
+        <p class="delete-modal-warning">
+            Cette action est irréversible.
+        </p>
+
+        <div class="modal-actions">
+            <button
+                type="button"
+                id="cancel-delete-button"
+                class="secondary-button"
+            >
+                Annuler
+            </button>
+
+            <button
+                type="button"
+                id="confirm-delete-button"
+                class="danger-button"
+            >
+                Supprimer
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
