@@ -9,8 +9,15 @@ from devsecapp.schemas.vulnerability import (
     VulnerabilityResponse,
     VulnerabilityUpdate,
 )
+from devsecapp.security.authorization import Role, require_role
 
-router = APIRouter(prefix="/vulnerabilities", tags=["vulnerabilities"])
+router = APIRouter(
+    prefix="/vulnerabilities",
+    tags=["vulnerabilities"],
+    dependencies=[
+        Depends(require_role(Role.IT, Role.DEVELOPER)),
+    ],
+)
 
 
 @router.post(
@@ -100,6 +107,9 @@ def update_vulnerability(
 @router.delete(
     "/{vulnerability_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[
+        Depends(require_role(Role.IT)),
+    ],
 )
 def delete_vulnerability(
     vulnerability_id: int,
