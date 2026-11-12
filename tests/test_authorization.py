@@ -22,9 +22,7 @@ def test_unauthorized_networks_are_denied(
     )
 
     assert response.status_code == 403
-    assert response.json() == {
-        "detail": "Access denied: unauthorized network"
-    }
+    assert response.json() == {"detail": "Access denied: unauthorized network"}
 
 
 @pytest.mark.parametrize(
@@ -55,9 +53,7 @@ def test_missing_client_ip_header_is_denied(test_engine) -> None:
         response = untrusted_client.get("/vulnerabilities")
 
     assert response.status_code == 403
-    assert response.json() == {
-        "detail": "Access denied: client IP is missing"
-    }
+    assert response.json() == {"detail": "Access denied: client IP is missing"}
 
 
 @pytest.mark.parametrize(

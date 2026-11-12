@@ -40,7 +40,6 @@ def create_app(database_engine: Engine) -> FastAPI:
     app.dependency_overrides[get_db] = get_database_session
     app.include_router(vulnerabilities_router)
 
-
     @app.get("/me")
     def get_current_user(
         current_role: Role = Depends(get_current_role),
