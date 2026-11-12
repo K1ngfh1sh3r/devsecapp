@@ -1,5 +1,7 @@
+// Point d’entrée de l’API utilisée pour consulter et gérer les vulnérabilités.
 const API_URL = "/api/vulnerabilities";
 
+// Correspondance entre les valeurs techniques de sévérité et les libellés affichés.
 const severityLabels = {
     LOW: "Faible",
     MEDIUM: "Moyenne",
@@ -13,6 +15,7 @@ const statusLabels = {
     RESOLVED: "Résolue"
 };
 
+// Classes CSS associées aux niveaux de sévérité pour leur présentation visuelle.
 const severityClasses = {
     LOW: "low",
     MEDIUM: "medium",
@@ -29,11 +32,46 @@ const statusClasses = {
 // Données chargées depuis l'API
 let allVulnerabilities = [];
 let editingVulnerabilityId = null;
+let currentRole = null;
 
 // --------------------------------------------------
 // UTILITAIRES
 // --------------------------------------------------
 
+// Identifie l’utilisateur connecté et adapte les informations affichées à son rôle.
+// Le serveur doit également vérifier les permissions : masquer un bouton ne sécurise pas une API.
+async function loadCurrentUser() {
+    const response = await fetch("/api/me", {
+        method: "GET",
+        headers: {
+            "Accept": "application/json"
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`Erreur identification HTTP ${response.status}`);
+    }
+
+    const user = await response.json();
+
+    if (!["IT", "Developer"].includes(user.role)) {
+        throw new Error("Rôle utilisateur inconnu.");
+    }
+
+    currentRole = user.role;
+
+    if (currentRole === "IT") {
+        setText("user-avatar", "IT");
+        setText("user-name", "Administrateur");
+        setText("user-team", "Équipe IT");
+    } else {
+        setText("user-avatar", "DV");
+        setText("user-name", "Développeur");
+        setText("user-team", "Équipe Développement");
+    }
+}
+
+// Met à jour le texte d’un élément HTML identifié, s’il existe.
 function setText(id, value) {
     const element = document.getElementById(id);
 
@@ -46,6 +84,7 @@ function setText(id, value) {
 // STATISTIQUES
 // --------------------------------------------------
 
+// Calcule les indicateurs globaux à partir de la liste de vulnérabilités reçue.
 function renderStatistics(vulnerabilities) {
     const total = vulnerabilities.length;
 
@@ -71,6 +110,7 @@ function renderStatistics(vulnerabilities) {
 // BADGES
 // --------------------------------------------------
 
+// Construit un badge HTML réutilisable pour afficher une sévérité ou un état.
 function createBadge(label, className) {
     const badge = document.createElement("span");
 
@@ -84,6 +124,9 @@ function createBadge(label, className) {
 // TABLEAUX DES VULNÉRABILITÉS
 // --------------------------------------------------
 
+// Génère dynamiquement les lignes des tableaux à partir des données reçues.
+// Cette fonction sert à la fois au tableau de bord et à l’inventaire complet.
+// textContent affiche les données comme du texte et évite de les interpréter comme du HTML.
 function renderVulnerabilityTable(
     vulnerabilities,
     tableId = "vulnerability-list",
@@ -171,14 +214,18 @@ function renderVulnerabilityTable(
             editButton.dataset.action = "edit";
             editButton.dataset.id = vulnerability.id;
 
-            const deleteButton = document.createElement("button");
-            deleteButton.type = "button";
-            deleteButton.className = "table-action delete-action";
-            deleteButton.textContent = "Supprimer";
-            deleteButton.dataset.action = "delete";
-            deleteButton.dataset.id = vulnerability.id;
+            actionsCell.appendChild(editButton);
 
-            actionsCell.append(editButton, deleteButton);
+            if (currentRole === "IT") {
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "table-action delete-action";
+                deleteButton.textContent = "Supprimer";
+                deleteButton.dataset.action = "delete";
+                deleteButton.dataset.id = vulnerability.id;
+
+                actionsCell.appendChild(deleteButton);
+            }
 
             row.append(
                 titleCell,
@@ -197,6 +244,7 @@ function renderVulnerabilityTable(
 // GRAPHIQUE : RÉPARTITION PAR SÉVÉRITÉ
 // --------------------------------------------------
 
+// Compte les vulnérabilités par niveau de sévérité pour alimenter le résumé graphique.
 function renderSeveritySummary(vulnerabilities) {
     const container = document.getElementById("severity-chart");
 
@@ -233,6 +281,7 @@ function renderSeveritySummary(vulnerabilities) {
 // GRAPHIQUE : ÉTAT DES VULNÉRABILITÉS
 // --------------------------------------------------
 
+// Regroupe les vulnérabilités selon leur état : ouverte, en cours ou résolue.
 function renderStatusSummary(vulnerabilities) {
     const container = document.getElementById("status-chart");
 
@@ -269,6 +318,7 @@ function renderStatusSummary(vulnerabilities) {
 // RAPPORTS DE SÉCURITÉ
 // --------------------------------------------------
 
+// Calcule les indicateurs et prépare les graphiques de la page des rapports.
 function renderReports(vulnerabilities) {
     const total = vulnerabilities.length;
 
@@ -535,6 +585,7 @@ if (statusContainer) {
 }
 
 
+// Exporte les vulnérabilités chargées dans un fichier CSV compatible avec les tableurs.
 function exportVulnerabilitiesCSV() {
     if (allVulnerabilities.length === 0) {
         alert("Aucune vulnérabilité à exporter.");
@@ -600,6 +651,7 @@ function exportVulnerabilitiesCSV() {
 // RECHERCHE ET FILTRES
 // --------------------------------------------------
 
+// Filtre localement les vulnérabilités selon le texte, la sévérité et le statut sélectionnés.
 function applyVulnerabilityFilters() {
     const searchInput = document.getElementById(
         "vulnerability-search"
@@ -675,6 +727,7 @@ function applyVulnerabilityFilters() {
 // RÉINITIALISATION DES FILTRES
 // --------------------------------------------------
 
+// Réinitialise les critères de recherche et réaffiche les vulnérabilités.
 function resetVulnerabilityFilters() {
     const searchInput = document.getElementById(
         "vulnerability-search"
@@ -707,6 +760,7 @@ function resetVulnerabilityFilters() {
 // GESTION DES ERREURS API
 // --------------------------------------------------
 
+// Affiche un état d’erreur lorsque le chargement des données depuis l’API échoue.
 function showApiError(message) {
     setText("total-count", "—");
     setText("critical-count", "—");
@@ -740,8 +794,12 @@ function showApiError(message) {
 // CHARGEMENT DES DONNÉES
 // --------------------------------------------------
 
+// Charge l’identité, les vulnérabilités et les indicateurs nécessaires au tableau de bord.
+// async/await permet d’attendre les réponses HTTP avant de mettre à jour l’interface.
 async function loadDashboard() {
     try {
+	await loadCurrentUser();
+
         const response = await fetch(API_URL, {
             method: "GET",
             headers: {
@@ -792,6 +850,7 @@ async function loadDashboard() {
 // NAVIGATION ENTRE LES VUES
 // --------------------------------------------------
 
+// Change de vue sans recharger la page et synchronise la navigation avec le fragment d’URL.
 function navigateToPage(pageName) {
     const pages = document.querySelectorAll(".page-view");
     const links = document.querySelectorAll(".nav-link");
@@ -831,6 +890,7 @@ function navigateToPage(pageName) {
 // INITIALISATION
 // --------------------------------------------------
 
+// Initialise la navigation, la recherche, les filtres et le chargement initial de l’application.
 document.addEventListener("DOMContentLoaded", () => {
     // Chargement initial
     loadDashboard();
@@ -913,6 +973,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // CRÉATION DE VULNÉRABILITÉS
 // --------------------------------------------------
 
+// Ouvre le formulaire : sans argument pour créer, avec une vulnérabilité pour la modifier.
 function openVulnerabilityModal(vulnerability = null) {
     const modal = document.getElementById("vulnerability-modal");
     const form = document.getElementById("vulnerability-form");
@@ -962,6 +1023,7 @@ function openVulnerabilityModal(vulnerability = null) {
 
     document.getElementById("vulnerability-title").focus();
 }
+// Ferme la fenêtre modale du formulaire de création ou de modification.
 function closeVulnerabilityModal() {
     const modal = document.getElementById("vulnerability-modal");
 
@@ -973,6 +1035,8 @@ function closeVulnerabilityModal() {
     modal.setAttribute("aria-hidden", "true");
 }
 
+// Transmet au serveur les données du formulaire pour créer ou modifier une vulnérabilité.
+// La méthode HTTP et l’URL dépendent de la présence d’un identifiant en cours de modification.
 async function createVulnerability(event) {
     event.preventDefault();
 
@@ -1055,6 +1119,7 @@ async function createVulnerability(event) {
 // ÉVÉNEMENTS DE LA FENÊTRE MODALE
 // --------------------------------------------------
 
+// Initialise les interactions du formulaire, de l’export et des actions sur les vulnérabilités.
 document.addEventListener("DOMContentLoaded", () => {
     const addButton = document.getElementById(
         "add-vulnerability-button"
@@ -1149,6 +1214,7 @@ const closeDeleteModalButton = document.getElementById(
 
 let pendingDeleteVulnerability = null;
 
+// Prépare la confirmation de suppression pour la vulnérabilité sélectionnée.
 function openDeleteModal(vulnerability) {
     pendingDeleteVulnerability = vulnerability;
 
@@ -1164,6 +1230,7 @@ function openDeleteModal(vulnerability) {
     deleteModal.setAttribute("aria-hidden", "false");
 }
 
+// Ferme la confirmation et réinitialise la sélection de suppression.
 function closeDeleteModal() {
     deleteModal.classList.remove("is-visible");
     deleteModal.setAttribute("aria-hidden", "true");
