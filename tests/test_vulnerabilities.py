@@ -1,11 +1,7 @@
 from fastapi.testclient import TestClient
 
-from devsecapp.main import app
 
-client = TestClient(app)
-
-
-def test_create_vulnerability() -> None:
+def test_create_vulnerability(client: TestClient) -> None:
     payload = {
         "title": "Test vulnerability",
         "description": "Created through the API test",
@@ -30,7 +26,7 @@ def test_create_vulnerability() -> None:
     assert data["updated_at"] is not None
 
 
-def test_create_vulnerability_invalid_severity() -> None:
+def test_create_vulnerability_invalid_severity(client: TestClient) -> None:
     payload = {
         "title": "Invalid vulnerability",
         "description": "This should be rejected",
@@ -44,7 +40,7 @@ def test_create_vulnerability_invalid_severity() -> None:
     assert response.status_code == 422
 
 
-def test_list_vulnerabilities() -> None:
+def test_list_vulnerabilities(client: TestClient) -> None:
     payload = {
         "title": "List test vulnerability",
         "description": "Created for the list endpoint test",
@@ -70,7 +66,7 @@ def test_list_vulnerabilities() -> None:
     )
 
 
-def test_get_vulnerability() -> None:
+def test_get_vulnerability(client: TestClient) -> None:
     payload = {
         "title": "Get test vulnerability",
         "description": "Created for the get endpoint test",
@@ -99,14 +95,14 @@ def test_get_vulnerability() -> None:
     assert data["affected_component"] == payload["affected_component"]
 
 
-def test_get_vulnerability_not_found() -> None:
+def test_get_vulnerability_not_found(client: TestClient) -> None:
     response = client.get("/vulnerabilities/999999")
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Vulnerability not found"}
 
 
-def test_update_vulnerability() -> None:
+def test_update_vulnerability(client: TestClient) -> None:
     payload = {
         "title": "Update test vulnerability",
         "description": "Original description",
@@ -136,7 +132,7 @@ def test_update_vulnerability() -> None:
     assert data["status"] == payload["status"]
 
 
-def test_update_multiple_vulnerability_fields() -> None:
+def test_update_multiple_vulnerability_fields(client: TestClient) -> None:
     payload = {
         "title": "Multiple update test",
         "description": "Original description",
@@ -171,7 +167,7 @@ def test_update_multiple_vulnerability_fields() -> None:
     assert data["affected_component"] == payload["affected_component"]
 
 
-def test_update_vulnerability_not_found() -> None:
+def test_update_vulnerability_not_found(client: TestClient) -> None:
     response = client.patch(
         "/vulnerabilities/999999",
         json={"severity": "CRITICAL"},
@@ -181,7 +177,7 @@ def test_update_vulnerability_not_found() -> None:
     assert response.json() == {"detail": "Vulnerability not found"}
 
 
-def test_update_vulnerability_updates_timestamp() -> None:
+def test_update_vulnerability_updates_timestamp(client: TestClient) -> None:
     payload = {
         "title": "Timestamp test",
         "description": "Testing updated_at",
@@ -212,10 +208,42 @@ def test_update_vulnerability_updates_timestamp() -> None:
     assert updated_data["updated_at"] != updated_at
 
 
-def test_delete_vulnerability() -> None:
+def test_delete_vulnerability(it_client: TestClient) -> None:
     payload = {
         "title": "Delete test vulnerability",
         "description": "Created for the delete endpoint test",
+        "severity": "HIGH",
+        "status": "OPEN",
+        "affected_component": "test-api",
+    }
+
+    create_response = it_client.post("/vulnerabilities", json=payload)
+
+    assert create_response.status_code == 201
+
+    vulnerability_id = create_response.json()["id"]
+
+    delete_response = it_client.delete(f"/vulnerabilities/{vulnerability_id}")
+
+    assert delete_response.status_code == 204
+    assert delete_response.content == b""
+
+    get_response = it_client.get(f"/vulnerabilities/{vulnerability_id}")
+
+    assert get_response.status_code == 404
+
+
+def test_delete_vulnerability_not_found(it_client: TestClient) -> None:
+    response = it_client.delete("/vulnerabilities/999999")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Vulnerability not found"}
+
+
+def test_developer_cannot_delete_vulnerability(client: TestClient) -> None:
+    payload = {
+        "title": "Protected vulnerability",
+        "description": "A developer must not be able to delete this",
         "severity": "HIGH",
         "status": "OPEN",
         "affected_component": "test-api",
@@ -229,16 +257,11 @@ def test_delete_vulnerability() -> None:
 
     delete_response = client.delete(f"/vulnerabilities/{vulnerability_id}")
 
-    assert delete_response.status_code == 204
-    assert delete_response.content == b""
+    assert delete_response.status_code == 403
+    assert delete_response.json() == {
+        "detail": "Access denied: insufficient permissions"
+    }
 
     get_response = client.get(f"/vulnerabilities/{vulnerability_id}")
 
-    assert get_response.status_code == 404
-
-
-def test_delete_vulnerability_not_found() -> None:
-    response = client.delete("/vulnerabilities/999999")
-
-    assert response.status_code == 404
-    assert response.json() == {"detail": "Vulnerability not found"}
+    assert get_response.status_code == 200
